@@ -25,5 +25,5 @@ This project analyzes the factors influencing programmer salaries across differe
 - Additional thanks to the authors of any open-source libraries used in the project.
 
 ## Project links
-- [GitHub Project Repository](https://github.com/nhpeytonwt/data-science-nanodegree/tree/main/Project-1-Compensation-Analysis)
+- [GitHub Project Repository](https://github.com/nhpeytonwt/ds-nanodegree-projects/tree/main/Project-1-Compensation-Analysis)
 - [Medium Blog Post](https://medium.com/@njhpeyton/optimize-your-programming-career-path-so-you-dont-fall-behind-5692774f0ecb)
