@@ -8,8 +8,15 @@ from sklearn.linear_model import LassoCV
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
-# Reading excel file into a dictionary of dataframes
 def read_excel_file(file_name):
+    """ Reads Excel file into a dictionary of dataframes organized by the file's sheet names
+
+    Args:
+        file_name: Path of the Excel file
+
+    Returns:
+        d: Dictionary of dataframes, where the keys are the file's sheet names
+    """
     _ = sh.copy(file_name, 'temp.xlsx')
     xls = pd.ExcelFile('temp.xlsx')
     d = {}
@@ -24,22 +31,45 @@ def read_excel_file(file_name):
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
-# For formatting displayed salary values as currencies
 def currency_fmt(x, pos):
+    """ Formats input values as currencies
+
+    Args:
+        x: Value to format
+        pos: Tick position of x
+
+    Returns:
+        Re-formatted value of x
+    """
     return '${:,.0f}'.format(x)
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
-# Categorizes salary into bands for salary by country chart
 def categorize_salary(salary, bands):
+    """ Categorizes salary into bands for salary by country chart
+
+    Args:
+        salary: Salary to categorize
+        bands: Dictionary of salary bands
+
+    Returns:
+        Band that the salary falls into
+    """
     for band, (lower, upper) in bands.items():
         if lower <= salary < upper:
             return band
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
-# Years of experience contains numerical and categorical vals, so we need to convert the categorcal vals
 def convert_yrs_exp(value):
+    """ Converts years of experience from categorical to numerical values if applicable
+
+    Args:
+        value: Input value, which is either 'Less than 1 year', 'More than 50 years', or a numerical value
+
+    Returns:
+        Years of experience, changed to a numerical if input was categorical
+    """
     if value == 'Less than 1 year':
         return 0
     elif value == 'More than 50 years':
@@ -49,8 +79,16 @@ def convert_yrs_exp(value):
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
-# Generate dummy variables, either splitting by semicolon for columns with multiple entries, or generating them normally
 def gen_dummies(df, column):
+    """ Generate dummy variables, either splitting by semicolon for columns with multiple entries, or generating them normally for entires with single values
+
+    Args:
+        df: Dataframe that target column is derived from
+        column: Column to generate dummies for
+
+    Returns:
+        Updated dataframe with dummy variables generated
+    """
     # Split by semicolon if the column contains multiple values
     if df[column].str.contains(';').any():
         split_data = df[column].str.get_dummies(sep=';')
@@ -64,9 +102,22 @@ def gen_dummies(df, column):
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
-# Function goes column-by-column and imputes missing values using a lasso regression
-# Basic idea: Find the columns that all have *complete* values where the target column has missing values, and use those for imputation
 def impute_missing_vals(df, target_col,columns_to_exclude, random_seed):
+    """ Function goes column-by-column and imputes missing values using a lasso regression
+        Basic idea: Find the columns that all have *complete* values where the target column has missing values, and use those for imputation
+
+    Args:
+        df: Dataframe that contains the target column
+        target_col: Target column to impute missing values
+        columns_to_exclude: Columns ignored in imputation
+        random_seed: Ensures reproducibility
+
+    Returns:
+        df_imputed: Updated df with missing values imputed
+        missing_data.shape[0]: Count of imputed values
+        lasso_cv.alpha_: Optimal alpha value from lasso crossval
+        r2: R² score of optimal model
+    """
     # For the target column, find which rows have missing (we want to fill these) and which have complete values
     missing_data = df[df[target_col].isnull()]
     complete_data = df.dropna(subset=[target_col])
